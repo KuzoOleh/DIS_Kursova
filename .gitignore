@@ -1,0 +1,36 @@
+# Ignore build directories
+/build/
+/bin/
+/obj/
+
+# Ignore temporary files from IDEs
+*.swp
+*.swo
+*.bak
+*.tmp
+.idea/
+.vscode/
+
+# Ignore the CMake cache and generated files
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+CTestTestfile.cmake
+
+# Ignore compiled object files
+*.o
+*.a
+*.so
+*.dll
+*.exe
+
+# Ignore dependency files
+*.d
+
+# Ignore Crow dependency build artifacts (if needed)
+Crow/build/
+
+# Ignore log files
+*.log
+

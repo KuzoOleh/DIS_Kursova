@@ -5,60 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simple Calculator</title>
     <style>
-        input[type="button"], input[type="text"] {
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-            margin: 5px;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
         }
-        input[type="text"] {
-            width: 220px;
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 5px 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
     <h1>Simple Calculator</h1>
-    <div>
-        <input type="text" id="display" disabled>
-        <br>
-        <input type="button" value="1" onclick="appendToDisplay('1')">
-        <input type="button" value="2" onclick="appendToDisplay('2')">
-        <input type="button" value="3" onclick="appendToDisplay('3')">
-        <input type="button" value="/" onclick="appendToDisplay('/')">
-        <br>
-        <input type="button" value="4" onclick="appendToDisplay('4')">
-        <input type="button" value="5" onclick="appendToDisplay('5')">
-        <input type="button" value="6" onclick="appendToDisplay('6')">
-        <input type="button" value="*" onclick="appendToDisplay('*')">
-        <br>
-        <input type="button" value="7" onclick="appendToDisplay('7')">
-        <input type="button" value="8" onclick="appendToDisplay('8')">
-        <input type="button" value="9" onclick="appendToDisplay('9')">
-        <input type="button" value="-" onclick="appendToDisplay('-')">
-        <br>
-        <input type="button" value="0" onclick="appendToDisplay('0')">
-        <input type="button" value="C" onclick="clearDisplay()">
-        <input type="button" value="=" onclick="calculate()">
-        <input type="button" value="+" onclick="appendToDisplay('+')">
-    </div>
+    <form id="calculator-form">
+        <label for="expression">Enter expression (e.g., 5+3):</label>
+        <input type="text" id="expression" name="expression" required>
+        <button type="submit">Calculate</button>
+    </form>
+    <div id="result"></div>
 
     <script>
-        function appendToDisplay(value) {
-            document.getElementById('display').value += value;
-        }
+        const form = document.querySelector('#calculator-form');
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const expression = document.querySelector('#expression').value;
+            const response = await fetch(`/api/calculate?expression=${encodeURIComponent(expression)}`);
+            const data = await response.json();
 
-        function clearDisplay() {
-            document.getElementById('display').value = '';
-        }
-
-        function calculate() {
-            const expression = document.getElementById('display').value;
-            fetch(`/api/calculate?expression=${encodeURIComponent(expression)}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('display').value = data.result;
-                });
-        }
+            const resultDiv = document.querySelector('#result');
+            if (data.result !== undefined) {
+                resultDiv.innerHTML = `<p>Result: ${data.result}</p>`;
+            } else if (data.error) {
+                resultDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+            }
+        });
     </script>
 </body>
 </html>

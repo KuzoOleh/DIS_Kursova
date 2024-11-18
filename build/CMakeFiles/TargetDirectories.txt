@@ -1,3 +1,0 @@
-/home/ubuntu/DIS_Kursova/build/CMakeFiles/calculator.dir
-/home/ubuntu/DIS_Kursova/build/CMakeFiles/edit_cache.dir
-/home/ubuntu/DIS_Kursova/build/CMakeFiles/rebuild_cache.dir
