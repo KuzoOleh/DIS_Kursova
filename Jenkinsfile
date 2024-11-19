@@ -15,8 +15,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Prevent tzdata interactive prompt and build the Docker image
-                    sh 'export DEBIAN_FRONTEND=noninteractive && docker build -t calculator-container .'
+                    // Set the timezone to UTC non-interactively and build the Docker image
+                    sh 'export DEBIAN_FRONTEND=noninteractive && export TZ=UTC && apt-get install -y tzdata && docker build -t calculator-container .'
                 }
             }
         }
