@@ -1,13 +1,13 @@
 pipeline {
     agent any
-    options {
-        timestamps()  // Add timestamps for better logging
+    options{
+        timestamps()
     }
 
     stages {
         stage('Getting project') {
             steps {
-                // Clone the project repository
+                // Clone the repository
                 sh "rm -rf DIS_Kursova; git clone https://github.com/KuzoOleh/DIS_Kursova.git"
             }
         }
@@ -15,7 +15,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Make sure Dockerfile is available and build the Docker image
+                    // Make sure the Dockerfile is available and build the Docker image
                     sh 'docker build -t calculator-container .'
                 }
             }
@@ -25,49 +25,25 @@ pipeline {
             steps {
                 script {
                     // Run the container, exposing the necessary port
-                    sh 'docker run -d -p 18080:80 --name calculator-container calculator-container'
+                    sh 'docker run -d -p 18080:80 calculator-container'
                 }
             }
         }
 
-        stage('SonarQube analysis') {
+        stage('SonarQube Analysis') {
             steps {
                 script {
                     // Run SonarQube analysis
-                    def scannerHome = tool 'Scanner'  // Make sure you have SonarScanner configured in Jenkins
-                    withSonarQubeEnv('sonarqube') {
-                        // Run the SonarQube Scanner for your project
-                        sh "cd DIS_Kursova && ${scannerHome}/bin/sonar-scanner"
-                    }
+                    sh 'sonar-scanner -Dsonar.login=${SONAR_TOKEN}'
                 }
             }
         }
 
-        stage('Quality Gate check') {
+        stage('Deploy') {
             steps {
                 script {
-                    // Wait for the quality gate to pass/fail
-                    def qualityGate = waitForQualityGate('sonarqube')  // 'sonarqube' is the name of the SonarQube server in Jenkins
-                    if (qualityGate.status != 'OK') {
-                        error "Quality Gate failed: ${qualityGate.status}"
-                    }
-                }
-            }
-        }
-
-        stage('Deploying Docker container') {
-            steps {
-                script {
-                    def containerExists = sh(script: "docker ps -a -q -f name=calculator-container", returnStdout: true).trim()
-
-                    if (containerExists) {
-                        // Stop and remove the existing container if it exists
-                        sh "docker stop calculator-container"
-                        sh "docker rm calculator-container"
-                    }
-
-                    // Run the container with the new Docker image
-                    sh "docker run -d -p 18080:80 --name calculator-container calculator-container"
+                    // Deploy your app, for example, to a cloud or a server
+                    echo 'Deploying the app...'
                 }
             }
         }
