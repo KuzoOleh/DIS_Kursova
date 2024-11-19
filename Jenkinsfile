@@ -1,28 +1,14 @@
 pipeline {
     agent any
-
-    environment {
-        // Set the timezone environment variable non-interactively
-        TZ = 'America/New_York'  // You can change this to your desired time zone
+    options {
+        timestamps()  // Add timestamps for better logging
     }
 
     stages {
-        stage('Setup Time Zone') {
+        stage('Getting project') {
             steps {
-                script {
-                    // Configure the system to avoid interactive tzdata prompts
-                    sh 'export DEBIAN_FRONTEND=noninteractive && sudo apt-get install -y tzdata'
-                    sh "sudo timedatectl set-timezone ${env.TZ}"
-                }
-            }
-        }
-
-        stage('Checkout Code') {
-            steps {
-                script {
-                    // Checkout the code from your repository
-                    checkout scm
-                }
+                // Clone the project repository
+                sh "rm -rf DIS_Kursova; git clone https://github.com/PolinaNechaiko/DIS_Kursova.git"
             }
         }
 
@@ -39,25 +25,49 @@ pipeline {
             steps {
                 script {
                     // Run the container, exposing the necessary port
-                    sh 'docker run -d -p 18080:80 calculator-container'
+                    sh 'docker run -d -p 18080:80 --name calculator-container calculator-container'
                 }
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('SonarQube analysis') {
             steps {
                 script {
                     // Run SonarQube analysis
-                    sh 'sonar-scanner -Dsonar.login=${SONAR_TOKEN}'
+                    def scannerHome = tool 'Scanner'  // Make sure you have SonarScanner configured in Jenkins
+                    withSonarQubeEnv('sonarqube') {
+                        // Run the SonarQube Scanner for your project
+                        sh "cd DIS_Kursova && ${scannerHome}/bin/sonar-scanner"
+                    }
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Quality Gate check') {
             steps {
                 script {
-                    // Deploy your app, for example, to a cloud or a server
-                    echo 'Deploying the app...'
+                    // Wait for the quality gate to pass/fail
+                    def qualityGate = waitForQualityGate('sonarqube')  // 'sonarqube' is the name of the SonarQube server in Jenkins
+                    if (qualityGate.status != 'OK') {
+                        error "Quality Gate failed: ${qualityGate.status}"
+                    }
+                }
+            }
+        }
+
+        stage('Deploying Docker container') {
+            steps {
+                script {
+                    def containerExists = sh(script: "docker ps -a -q -f name=calculator-container", returnStdout: true).trim()
+
+                    if (containerExists) {
+                        // Stop and remove the existing container if it exists
+                        sh "docker stop calculator-container"
+                        sh "docker rm calculator-container"
+                    }
+
+                    // Run the container with the new Docker image
+                    sh "docker run -d -p 18080:80 --name calculator-container calculator-container"
                 }
             }
         }
