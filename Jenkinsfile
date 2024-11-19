@@ -30,11 +30,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Install and use buildx for building the Docker image (recommended approach to avoid deprecation)
-                    sh """
-                    docker buildx create --use
-                    docker buildx build -t calculator-image -f ./Dockerfile .
-                    """
+                    // Use the legacy Docker builder (docker build)
+                    sh "docker build -t calculator-image -f ./Dockerfile ."
                 }
             }
         }
