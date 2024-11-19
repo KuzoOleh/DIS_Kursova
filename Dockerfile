@@ -23,7 +23,7 @@ RUN echo "UTC" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata
 COPY . /app
 
 # Build the C++ application (adjust this to your specific build commands)
-RUN g++ -o calculator main.cpp # Adjust this command to suit your build setup, e.g., if you have a Makefile
+RUN g++ -o calculator calculator.cpp # Adjust this command to suit your build setup, e.g., if you have a Makefile
 
 # Expose the port your app will listen on (in this case, port 18080)
 EXPOSE 18080
