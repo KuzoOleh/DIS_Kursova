@@ -8,7 +8,7 @@ pipeline {
         stage('Getting project') {
             steps {
                 // Clone the project repository
-                sh "rm -rf DIS_Kursova; git clone https://github.com/PolinaNechaiko/DIS_Kursova.git"
+                sh "rm -rf DIS_Kursova; git clone https://github.com/KuzoOleh/DIS_Kursova.git"
             }
         }
 
