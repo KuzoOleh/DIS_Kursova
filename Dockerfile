@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
 RUN echo "UTC" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata
 
 # Copy the pre-built calculator binary and other necessary files into the container
-COPY ./build/calculator /app/calculator
+COPY ./calculator /app/calculator
 COPY ./index.html /app/index.html
 
 # Expose the port your app will listen on (in this case, port 18080)
