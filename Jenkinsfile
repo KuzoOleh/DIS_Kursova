@@ -30,9 +30,10 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build Docker image (update according to your needs)
+                    // Install and use buildx for building the Docker image (recommended approach to avoid deprecation)
                     sh """
-                    docker build -t my-app-image -f ./Dockerfile .
+                    docker buildx create --use
+                    docker buildx build -t calculator-image -f ./Dockerfile .
                     """
                 }
             }
@@ -42,16 +43,16 @@ pipeline {
             steps {
                 script {
                     // Stop and remove any existing container if it exists
-                    def containerExists = sh(script: "docker ps -a -q -f name=my-app-container", returnStdout: true).trim()
+                    def containerExists = sh(script: "docker ps -a -q -f name=calculator-container", returnStdout: true).trim()
                     if (containerExists) {
                         sh """
-                            docker stop my-app-container
-                            docker rm my-app-container
+                            docker stop calculator-container
+                            docker rm calculator-container
                         """
                     }
                     // Run the container with the new image
                     sh """
-                        docker run -d -p 80:80 --name my-app-container my-app-image
+                        docker run -d -p 80:80 --name calculator-container calculator-image
                     """
                 }
             }
