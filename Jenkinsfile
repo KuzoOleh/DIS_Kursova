@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    options{
+    options {
         timestamps()
     }
 
@@ -34,16 +34,19 @@ pipeline {
             steps {
                 script {
                     // Run SonarQube analysis
-                    sh 'sonar-scanner -Dsonar.login=${SONAR_TOKEN}'
+                    withCredentials([string(credentialsId: 'sonar-token-id', variable: 'SONAR_TOKEN')]) {
+                        sh 'sonar-scanner -Dsonar.login=${SONAR_TOKEN}'
+                    }
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Verify Deployment') {
             steps {
                 script {
-                    // Deploy your app, for example, to a cloud or a server
-                    echo 'Deploying the app...'
+                    // Ensure the container is running and accessible
+                    sh 'docker ps -q -f "name=calculator-container" || echo "Container not running!"'
+                    sh 'curl -f http://localhost:18080 || echo "App not responding!"'
                 }
             }
         }
@@ -53,6 +56,7 @@ pipeline {
         always {
             // Clean up after the build if necessary
             echo 'Cleaning up...'
+            sh 'docker ps -a -q --filter "name=calculator-container" | xargs -I {} docker rm -f {} || true'
         }
         success {
             echo 'Build and deployment completed successfully!'
