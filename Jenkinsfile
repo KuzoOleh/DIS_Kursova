@@ -15,8 +15,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Make sure the Dockerfile is available and build the Docker image
-                    sh 'docker build -t calculator-container .'
+                    // Prevent tzdata interactive prompt and build the Docker image
+                    sh 'export DEBIAN_FRONTEND=noninteractive && docker build -t calculator-container .'
                 }
             }
         }
