@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     // Run SonarQube analysis
-                    withCredentials([string(credentialsId: 'sonar-token-id', variable: 'SONAR_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'squ_a9ce58bee1a5403bb2f224011149144cb107303e', variable: 'SONAR_TOKEN')]) {
                         sh 'sonar-scanner -Dsonar.login=${SONAR_TOKEN}'
                     }
                 }
