@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
 # Set the timezone (you can replace "UTC" with your preferred timezone, e.g., "Europe/London")
 RUN echo "UTC" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata
 
-# Copy the pre-built calculator binary and other necessary files (index.html, etc.) into the container
+# Copy the pre-built calculator binary and other necessary files into the container
 COPY ./build/calculator /app/calculator
 COPY ./index.html /app/index.html
 
