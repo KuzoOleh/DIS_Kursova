@@ -27,7 +27,7 @@ int main() {
     // Serve the index.html file for the root route
     CROW_ROUTE(app, "/")
     ([]() {
-        std::ifstream file("/home/ubuntu/DIS_Kursova/index.html");  // Make sure the HTML file is in the same directory
+        std::ifstream file("index.html");  // Make sure the HTML file is in the same directory
         if (!file.is_open()) {
             return crow::response{500, "Error: Could not load index.html"};
         }
