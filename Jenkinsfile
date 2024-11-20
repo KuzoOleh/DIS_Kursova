@@ -32,7 +32,6 @@ pipeline {
 		    cd DIS_Kursova/build
 		    cmake ..
 		    make
-		    mv calculator ../
 		    '''
                 }
             }

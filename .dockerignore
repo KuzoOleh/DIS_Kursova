@@ -1,0 +1,11 @@
+# Ignore everything in build/ directory
+build/*
+
+# But do NOT ignore the calculator binary in the build/ directory
+!build/calculator
+
+# Ignore other unnecessary files
+*.log
+*.tmp
+*.env
+.git/
