@@ -27,10 +27,13 @@ pipeline {
             steps {
                 script {
                     // Create build directory, configure cmake, and make the application
-                    sh 'mkdir -p DIS_Kursova/build && cd DIS_Kursova/build && cmake .. && make'
-                    
-                    // Move the built binary to the correct location
-                    sh 'mv DIS_Kursova/build/calculator DIS_Kursova/calculator'
+                    sh '''
+		    mkdir -p DIS_Kursova/build
+		    cd DIS_Kursova/build
+		    cmake ..
+		    make
+		    mv calculator ../
+		    '''
                 }
             }
         }
