@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y software-properties-common && \
 WORKDIR /app
 
 # Copy the pre-built binary and index.html into the container
-COPY ./calculator /app/calculator
+COPY ./build/calculator /app/calculator
 COPY ./index.html /app/index.html
 
 # Expose the port your app will listen on
