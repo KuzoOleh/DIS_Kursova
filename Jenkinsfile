@@ -7,25 +7,13 @@ pipeline {
     stages {
         stage('Getting project') {
             steps {
-                // Clone the repository
+                // Clone the repository and change to the repo directory
                 sh "rm -rf DIS_Kursova; git clone https://github.com/KuzoOleh/DIS_Kursova.git"
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    // Set the timezone to UTC non-interactively and build the Docker image
-                    sh 'export DEBIAN_FRONTEND=noninteractive && export TZ=UTC && apt-get install -y tzdata && docker build -t calculator-container .'
-                }
-            }
-        }
-
-        stage('Run Docker Container') {
-            steps {
-                script {
-                    // Run the container, exposing the necessary port
-                    sh 'docker run -d -p 18080:80 calculator-container'
+                dir('DIS_Kursova') {
+                    script {
+                        // Ensure we're in the right directory for subsequent commands
+                        echo "Cloning the repository and moving to DIS_Kursova directory"
+                    }
                 }
             }
         }
@@ -33,10 +21,58 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
+                    // Run SonarQube analysis
                     def scannerHome = tool 'sonarscanner'
-		    withSonarQubeEnv('sonarqube') {
-			sh "cd DIS_Kursova && ${scannerHome}/bin/sonar-scanner"
-			}
+                    withSonarQubeEnv('sonarqube') {
+                        // Assuming the project is in the 'DIS_Kursova' directory
+                        dir('DIS_Kursova') {
+                            sh "${scannerHome}/bin/sonar-scanner"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Build Application') {
+            steps {
+                script {
+                    // Create the build directory, run cmake and make
+                    dir('DIS_Kursova') {
+                        // Create a build directory and run cmake & make
+                        sh 'mkdir -p build'
+                        sh 'cd build && cmake .. && make'
+                    }
+                }
+            }
+        }
+
+        stage('Move Calculator Binary') {
+            steps {
+                script {
+                    // Move the compiled binary (calculator) out of the build directory
+                    dir('DIS_Kursova') {
+                        sh 'mv build/calculator ./calculator'
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build the Docker image with the compiled binary
+                    dir('DIS_Kursova') {
+                        sh 'docker build -t calculator-container .'
+                    }
+                }
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    // Run the Docker container
+                    sh 'docker run -d -p 18080:18080 calculator-container'
                 }
             }
         }
