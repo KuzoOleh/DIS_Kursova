@@ -33,10 +33,10 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    // Run SonarQube analysis
-                    withCredentials([string(credentialsId: 'squ_a9ce58bee1a5403bb2f224011149144cb107303e', variable: 'SONAR_TOKEN')]) {
-                        sh 'sonar-scanner -Dsonar.login=${SONAR_TOKEN}'
-                    }
+                    def scannerHome = tool 'sonarscanner'
+		    withSonarQubeEnv('sonarqube') {
+			sh "cd DIS_Kursova && {scannerHome}/bin/sonar-scanner"
+			}
                 }
             }
         }
