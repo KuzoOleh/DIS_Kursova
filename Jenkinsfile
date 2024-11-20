@@ -35,7 +35,7 @@ pipeline {
                 script {
                     def scannerHome = tool 'sonarscanner'
 		    withSonarQubeEnv('sonarqube') {
-			sh "cd DIS_Kursova && {scannerHome}/bin/sonar-scanner"
+			sh "cd DIS_Kursova && ${scannerHome}/bin/sonar-scanner"
 			}
                 }
             }
