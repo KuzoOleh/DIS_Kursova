@@ -46,22 +46,23 @@ pipeline {
             }
         }
 
-        stage('Run Docker Container') {
-            steps {
-                script {
-                    // Delete previous container if it exists
-                    sh '''
-                    if [ "$(docker ps -a -q -f name=calculator-container)" ]; then
-                        docker stop calculator-container
-                        docker rm calculator-container
-                    fi
-                    '''
-                    
-                    // Run the container, exposing the necessary port
-                    sh 'docker run -d -p 18080:18080 calculator-container'
-                }
-            }
+stage('Run Docker Container') {
+    steps {
+        script {
+            // Delete previous container if it exists
+            sh '''
+            if [ "$(docker ps -a -q -f name=calculator-container)" ]; then
+                docker stop calculator-container || true
+                docker rm calculator-container || true
+            fi
+            '''
+            
+            // Run the container, exposing the necessary port
+            sh 'docker run -d -p 18080:18080 --name calculator-container calculator-image'
         }
+    }
+}
+
 
         stage('Verify Deployment') {
             steps {
