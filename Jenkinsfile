@@ -46,35 +46,22 @@ pipeline {
             }
         }
 
-stage('Run Docker Container') {
-    steps {
-        script {
-            // Stop and remove the container if it exists
-            sh '''
-            if [ "$(docker ps -a -q -f name=calculator-container)" ]; then
-                docker stop calculator-container || true
-                docker rm calculator-container || true
-            fi
-            '''
-
-            // Ensure no process is using the port
-            sh '''
-            if lsof -i :18080; then
-                echo "Port 18080 is in use. Killing process..."
-                fuser -k 18080/tcp || true
-            fi
-            '''
-
-            // Build the Docker image locally
-            sh 'docker build -t calculator-image .'
-
-            // Run the container using the locally built image
-            sh 'docker run -d -p 18080:18080 --name calculator-container calculator-image'
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    // Delete previous container if it exists
+                    sh '''
+                    if [ "$(docker ps -a -q -f name=calculator-container)" ]; then
+                        docker stop calculator-container
+                        docker rm calculator-container
+                    fi
+                    '''
+                    
+                    // Run the container, exposing the necessary port
+                    sh 'docker run -d -p 18080:18080 calculator-container'
+                }
+            }
         }
-    }
-}
-
-
 
         stage('Verify Deployment') {
             steps {
