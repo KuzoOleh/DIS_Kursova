@@ -28,11 +28,11 @@ pipeline {
                 script {
                     // Create build directory, configure cmake, and make the application
                     sh '''
-		    mkdir -p DIS_Kursova/build
-		    cd DIS_Kursova/build
-		    cmake ..
-		    make
-		    '''
+                    mkdir -p DIS_Kursova/build
+                    cd DIS_Kursova/build
+                    cmake ..
+                    make
+                    '''
                 }
             }
         }
@@ -46,9 +46,6 @@ pipeline {
             }
         }
 
-pipeline {
-    agent any
-    stages {
         stage('Run Docker Container') {
             steps {
                 script {
@@ -91,8 +88,6 @@ pipeline {
             }
         }
     }
-}
-
 
     post {
         always {
@@ -108,4 +103,3 @@ pipeline {
         }
     }
 }
-
