@@ -56,8 +56,11 @@ stage('Run Docker Container') {
                 docker rm calculator-container || true
             fi
             '''
-            
-            // Run the container, exposing the necessary port
+
+            // Build the Docker image locally
+            sh 'docker build -t calculator-image .'
+
+            // Run the container using the locally built image
             sh 'docker run -d -p 18080:18080 --name calculator-container calculator-image'
         }
     }
