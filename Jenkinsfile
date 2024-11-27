@@ -28,11 +28,11 @@ pipeline {
                 script {
                     // Create build directory, configure cmake, and make the application
                     sh '''
-                    mkdir -p DIS_Kursova/build
-                    cd DIS_Kursova/build
-                    cmake ..
-                    make
-                    '''
+		    mkdir -p DIS_Kursova/build
+		    cd DIS_Kursova/build
+		    cmake ..
+		    make
+		    '''
                 }
             }
         }
@@ -52,15 +52,13 @@ pipeline {
                     // Delete previous container if it exists
                     sh '''
                     if [ "$(docker ps -a -q -f name=calculator-container)" ]; then
-                        echo "Stopping and removing existing container"
                         docker stop calculator-container
                         docker rm calculator-container
                     fi
                     '''
                     
                     // Run the container, exposing the necessary port
-                    echo "Starting new container"
-                    sh 'docker run -d --name calculator-container -p 18080:18080 calculator-container'
+                    sh 'docker run -d -p 18080:18080 calculator-container'
                 }
             }
         }
@@ -69,21 +67,8 @@ pipeline {
             steps {
                 script {
                     // Ensure the container is running and accessible
-                    def containerStatus = sh(script: 'docker ps -q -f "name=calculator-container"', returnStdout: true).trim()
-                    
-                    if (containerStatus) {
-                        echo "Container is running"
-                    } else {
-                        echo "Container not running!"
-                    }
-
-                    // Test if the application inside the container is accessible
-                    try {
-                        sh 'curl -f http://localhost:18080'
-                        echo "App is responding!"
-                    } catch (Exception e) {
-                        echo "App not responding!"
-                    }
+                    sh 'docker ps -q -f "name=calculator-container" || echo "Container not running!"'
+                    sh 'curl -f http://localhost:18080 || echo "App not responding!"'
                 }
             }
         }
