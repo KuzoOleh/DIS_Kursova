@@ -46,22 +46,22 @@ pipeline {
             }
         }
 
-stage('Run Docker Container') {
-    steps {
-        script {
-            // Ensure no container is using port 18080
-            sh '''
-            if [ "$(docker ps -q --filter 'publish=18080')" ]; then
-                echo "Stopping container using port 18080"
-                docker ps -q --filter 'publish=18080' | xargs -r docker rm -f
-            fi
-            '''
-
-            // Run the new container
-            sh 'docker run -d -p 18080:18080 --name calculator-container calculator-container'
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    // Delete previous container if it exists
+                    sh '''
+                    if [ "$(docker ps -a -q -f name=calculator-container)" ]; then
+                        docker stop calculator-container
+                        docker rm calculator-container
+                    fi
+                    '''
+                    
+                    // Run the container, exposing the necessary port
+                    sh 'docker run -d -p 18080:18080 calculator-container'
+                }
+            }
         }
-    }
-}
 
         stage('Verify Deployment') {
             steps {
