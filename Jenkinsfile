@@ -49,11 +49,19 @@ pipeline {
 stage('Run Docker Container') {
     steps {
         script {
-            // Delete previous container if it exists
+            // Stop and remove the container if it exists
             sh '''
             if [ "$(docker ps -a -q -f name=calculator-container)" ]; then
                 docker stop calculator-container || true
                 docker rm calculator-container || true
+            fi
+            '''
+
+            // Ensure no process is using the port
+            sh '''
+            if lsof -i :18080; then
+                echo "Port 18080 is in use. Killing process..."
+                fuser -k 18080/tcp || true
             fi
             '''
 
@@ -65,6 +73,7 @@ stage('Run Docker Container') {
         }
     }
 }
+
 
 
         stage('Verify Deployment') {
